@@ -31,52 +31,49 @@ server <- function(input, output, session) {
     # Exclure les 5 premières lignes et colonnes
     num <- random_numbers_val[-c(1:5), -c(1:5)]
 
-    # Afficher la nouvelle matrice
-    print(num)
-
-
+    #DECOMPTE PAR LIGNE
 
     # Initialiser le vecteur de compteurs
-    counters <- matrix(0, nrow = size - 5, ncol = size - 5)
+    counters_l <- matrix(0, nrow = size - 5, ncol = size - 5)
 
     for (i in 1:(size - 5)) {
-      c=1
+      c <- 1
       counter <- 0  # Réinitialiser le compteur pour chaque ligne
       for (j in 1:(size - 5)) {
         if (num[i, j] == 1) {
           counter <- counter + 1
         } else {
           if (counter > 0) {
-            counters[i,c] <- counter
-            c <- c+1
+            counters_l[i, c] <- counter
+            c <- c + 1
             counter <- 0
           }
         }
       }
-      counters[i,c] <- counter
+      counters_l[i, c] <- counter
     }
-
-    # Afficher le vecteur de compteurs
-    print(counters)
-
-    # Sélectionner que les nombres strictement positifs de counters
-    num_line <- c()
-    num_line_tot <- c()
-    for (i in 1:(size-5)){
-      num_line <- c()
-      for (j in 1:(size-5)){
-        if (counters[i, j] > 0){
-          num_line <- c(num_line, counters[i, j])
+    
+    #DECOMPTE PAR COLONNE
+    counters_c <- matrix(0, nrow = size - 5, ncol = size - 5)
+    
+    for (j in 1:(size - 5)) {
+      l=1
+      counter <- 0  # Réinitialiser le compteur pour chaque ligne
+      for (i in 1:(size - 5)) {
+        if (num[i, j] == 1) {
+          counter <- counter + 1
+        } else {
+          if (counter > 0) {
+            counters_c[l, j] <- counter
+            l <- l + 1
+            counter <- 0
+          }
         }
       }
-      num_line_tot <- c(num_line_tot, list(num_line))
+      counters_c[l, j] <- counter
     }
 
-    print(num_line_tot[1])
-
-
-
-    # Affichage grille principale
+    # AFFICHAGE GRILLE
     output$grid_container <- renderUI({
       grid_divs <- lapply(1:size, function(i) {
         lapply(1:size, function(j) {
@@ -84,7 +81,14 @@ server <- function(input, output, session) {
             div(
               class = "cell",
               style = "text-align: center; font-weight: bold; border: none;",
-              counters[i-5]
+              counters_l[i-5, j]
+            )
+          } 
+          else if (i <= 5 & j >= 5) {
+            div(
+              class = "cell",
+              style = "text-align: center; font-weight: bold; border: none;",
+              counters_c[i, j-5]
             )
           } else {
             div(
@@ -107,9 +111,6 @@ server <- function(input, output, session) {
       )
     })
   })
-
-  # Utilisation de la bibliothèque shinyjs pour appliquer des styles CSS supplémentaires
-  shinyjs::useShinyjs()
 }
 
 shinyApp(ui, server)
