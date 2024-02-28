@@ -1,7 +1,9 @@
 library(shiny)
+library(shinyjs)
 
 ui <- fluidPage(
   titlePanel("Picross"),
+  shinyjs::useShinyjs(),
   mainPanel(
     fluidRow(
       column(12, align = "center", sliderInput("grid_size", label = "Taille de la grille", value = 5, min = 5, max = 20)),
@@ -18,7 +20,7 @@ server <- function(input, output, session) {
   random_numbers <- reactiveVal(matrix(0, nrow = 1, ncol = 1))
   decompte_grid <- reactiveVal(NULL)
   decompte_colonne <- reactiveVal(NULL)
-
+  
   observeEvent(input$grid_size, {
     # Définir la taille de la matrice en ajoutant 5 à grid_size
     size <- input$grid_size + 5
@@ -77,38 +79,49 @@ server <- function(input, output, session) {
     output$grid_container <- renderUI({
       grid_divs <- lapply(1:size, function(i) {
         lapply(1:size, function(j) {
+          common_style <- paste("margin: 1px;", ifelse(i <= 5 | j <= 5, "border: none;", "border: 1px solid black;"))
+          
           if (i >= 5 & j <= 5) {
             div(
               class = "cell",
-              style = "text-align: center; font-weight: bold; border: none;",
+              style = paste("text-align: center; font-weight: bold; border: none;", common_style),
               counters_l[i-5, j]
             )
-          } 
-          else if (i <= 5 & j >= 5) {
+          } else if (i <= 5 & j >= 5) {
             div(
               class = "cell",
-              style = "text-align: center; font-weight: bold; border: none;",
+              style = paste("text-align: center; font-weight: bold; border: none;", common_style),
               counters_c[i, j-5]
             )
           } else {
             div(
-              class = paste("cell cell_", random_numbers()[i, j]),
-              style = if (random_numbers()[i, j] == 1) {
-                paste("background-color: black; margin: 1px;", ifelse(i <= 5 | j <= 5, "border: none;", "border: 1px solid black;"))
-              } else {
-                paste("margin: 1px;", ifelse(i <= 5 | j <= 5, "border: none;", "border: 1px solid black;"))
+              class = "grid_cell",
+              style = paste("margin: 1px;", ifelse(i <= 5 | j <= 5, "border: none;", "border: 1px solid black;"))
               },
               id = paste("cell_", i, "_", j)
             )
           }
         })
       })
-
+      
       tags$div(
         id = "grid",
         style = paste("width: 500px; height: 500px; border: 1px solid black; display: grid; grid-template-columns: repeat(", size, ", 1fr); grid-template-rows: repeat(", size, ", 1fr);"),
         grid_divs
       )
+      
+      observe({
+        # Ajoutez un écouteur de clic à chaque case
+        shinyjs::runjs('
+      $(".ma_case").click(function() {
+        if ($(this).css("background-color") === "rgb(255, 255, 255)") {
+          $(this).css("background-color", "black");
+        } else {
+          $(this).css("background-color", "white");
+        }
+      });
+    ')
+      })
     })
   })
 }
@@ -143,6 +156,44 @@ shinyApp(ui, server)
 
 
 
+
+
+
+
+
+library(shiny)
+library(shinyjs)
+
+ui <- fluidPage(
+  shinyjs::useShinyjs(),  # Utilise shinyjs
+  
+  titlePanel("Cases Blanches à Noires"),
+  
+  mainPanel(
+    # Utilisez la fonction div pour créer les quatre cases
+    div(id = "case1", class = "ma_case", style = "width: 50px; height: 50px; background-color: white; border: 1px solid black; float: left;"),
+    div(id = "case2", class = "ma_case", style = "width: 50px; height: 50px; background-color: white; border: 1px solid black; float: left;"),
+    div(id = "case3", class = "ma_case", style = "width: 50px; height: 50px; background-color: white; border: 1px solid black; float: left;"),
+    div(id = "case4", class = "ma_case", style = "width: 50px; height: 50px; background-color: white; border: 1px solid black; float: left;")
+  )
+)
+
+server <- function(input, output, session) {
+  observe({
+    # Ajoutez un écouteur de clic à chaque case
+    shinyjs::runjs('
+      $(".ma_case").click(function() {
+        if ($(this).css("background-color") === "rgb(255, 255, 255)") {
+          $(this).css("background-color", "black");
+        } else {
+          $(this).css("background-color", "white");
+        }
+      });
+    ')
+  })
+}
+
+shinyApp(ui, server)
 
 
 
