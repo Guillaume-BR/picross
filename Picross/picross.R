@@ -7,15 +7,13 @@ ui <- fluidPage(
   mainPanel(
     fluidRow(
       column(12, align = "center", sliderInput("grid_size", label = "Taille de la grille", value = 5, min = 5, max = 20)),
-      column(12, uiOutput("top_grid")),  # Nouvelle colonne pour afficher le nombre de cases noires par colonne
-      column(2, id = "left_column", uiOutput("left_grid")),  # Colonne pour afficher le nombre de cases noires par ligne
       column(10, uiOutput("grid_container"))
     )
   )
 )
 
 server <- function(input, output, session) {
-
+  
   # Déclarer random_numbers en tant que variable réactive
   random_numbers <- reactiveVal(matrix(0, nrow = 1, ncol = 1))
   decompte_grid <- reactiveVal(NULL)
@@ -24,20 +22,20 @@ server <- function(input, output, session) {
   observeEvent(input$grid_size, {
     # Définir la taille de la matrice en ajoutant 5 à grid_size
     size <- input$grid_size + 5
-
+    
     # Générer la matrice avec des valeurs aléatoires uniquement pour les cases qui ne sont pas parmi les 5 premières lignes et 5 premières colonnes
     random_numbers_val <- matrix(0, nrow = size, ncol = size)
     random_numbers_val[6:size, 6:size] <- sample(0:1, (size - 5)^2, replace = TRUE)
     random_numbers(random_numbers_val)
-
+    
     # Exclure les 5 premières lignes et colonnes
     num <- random_numbers_val[-c(1:5), -c(1:5)]
-
+    
     #DECOMPTE PAR LIGNE
-
+    
     # Initialiser le vecteur de compteurs
     counters_l <- matrix(0, nrow = size - 5, ncol = size - 5)
-
+    
     for (i in 1:(size - 5)) {
       c <- 1
       counter <- 0  # Réinitialiser le compteur pour chaque ligne
@@ -74,7 +72,7 @@ server <- function(input, output, session) {
       }
       counters_c[l, j] <- counter
     }
-
+    
     # AFFICHAGE GRILLE
     output$grid_container <- renderUI({
       grid_divs <- lapply(1:size, function(i) {
@@ -96,8 +94,7 @@ server <- function(input, output, session) {
           } else {
             div(
               class = "grid_cell",
-              style = paste("margin: 1px;", ifelse(i <= 5 | j <= 5, "border: none;", "border: 1px solid black;"))
-              },
+              style = paste("margin: 1px;", ifelse(i <= 5 | j <= 5, "border: none;", "border: 1px solid black;")),
               id = paste("cell_", i, "_", j)
             )
           }
@@ -109,120 +106,20 @@ server <- function(input, output, session) {
         style = paste("width: 500px; height: 500px; border: 1px solid black; display: grid; grid-template-columns: repeat(", size, ", 1fr); grid-template-rows: repeat(", size, ", 1fr);"),
         grid_divs
       )
-      
-      observe({
-        # Ajoutez un écouteur de clic à chaque case
-        shinyjs::runjs('
-      $(".ma_case").click(function() {
-        if ($(this).css("background-color") === "rgb(255, 255, 255)") {
-          $(this).css("background-color", "black");
-        } else {
-          $(this).css("background-color", "white");
-        }
-      });
-    ')
-      })
     })
-  })
-}
-
-shinyApp(ui, server)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-library(shiny)
-library(shinyjs)
-
-ui <- fluidPage(
-  shinyjs::useShinyjs(),  # Utilise shinyjs
-  
-  titlePanel("Cases Blanches à Noires"),
-  
-  mainPanel(
-    # Utilisez la fonction div pour créer les quatre cases
-    div(id = "case1", class = "ma_case", style = "width: 50px; height: 50px; background-color: white; border: 1px solid black; float: left;"),
-    div(id = "case2", class = "ma_case", style = "width: 50px; height: 50px; background-color: white; border: 1px solid black; float: left;"),
-    div(id = "case3", class = "ma_case", style = "width: 50px; height: 50px; background-color: white; border: 1px solid black; float: left;"),
-    div(id = "case4", class = "ma_case", style = "width: 50px; height: 50px; background-color: white; border: 1px solid black; float: left;")
-  )
-)
-
-server <- function(input, output, session) {
-  observe({
-    # Ajoutez un écouteur de clic à chaque case
+    
     shinyjs::runjs('
-      $(".ma_case").click(function() {
-        if ($(this).css("background-color") === "rgb(255, 255, 255)") {
-          $(this).css("background-color", "black");
-        } else {
-          $(this).css("background-color", "white");
-        }
-      });
-    ')
+    $(document).on("click", ".grid_cell", function(){
+    if($(this).css("background-color") === "rgb(255, 255, 255)") {
+      $(this).css("background-color", "black");
+    } else {
+      $(this).css("background-color", "white");
+    }
+    });
+  ')
   })
 }
 
 shinyApp(ui, server)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
