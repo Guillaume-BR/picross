@@ -40,9 +40,9 @@ server <- function(input, output, session) {
       c <- 1
       counter <- 0  # Réinitialiser le compteur pour chaque ligne
       for (j in 1:(size - 5)) {
-        if (num[i, j] == 1) {
+        if (num[i, j] == 1) { # Incrémenter pour case noire consécutive
           counter <- counter + 1
-        } else {
+        } else { # Attribuer et réinitialiser le compteur si on tombe sur une case blanche
           if (counter > 0) {
             counters_l[i, c] <- counter
             c <- c + 1
@@ -50,15 +50,15 @@ server <- function(input, output, session) {
           }
         }
       }
-      counters_l[i, c] <- counter
+      counters_l[i, c] <- counter # Attribuer le compteur en passant à une nouvelle ligne
     }
     
-    #DECOMPTE PAR COLONNE
+    #DECOMPTE PAR COLONNE (même principe en inversant les indices)
     counters_c <- matrix(0, nrow = size - 5, ncol = size - 5)
     
     for (j in 1:(size - 5)) {
-      l=1
-      counter <- 0  # Réinitialiser le compteur pour chaque ligne
+      l <- 1
+      counter <- 0
       for (i in 1:(size - 5)) {
         if (num[i, j] == 1) {
           counter <- counter + 1
