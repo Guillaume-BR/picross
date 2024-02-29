@@ -21,18 +21,20 @@ server <- function(input, output, session) {
   
   observeEvent(input$grid_size, {
     # Définir la taille de la matrice en ajoutant 5 à grid_size
+    # Attention il faut potentiellement grid_size/2 info
     size <- input$grid_size + 5
     
     # Générer la matrice avec des valeurs aléatoires uniquement pour les cases qui ne sont pas parmi les 5 premières lignes et 5 premières colonnes
     random_numbers_val <- matrix(0, nrow = size, ncol = size)
-    random_numbers_val[6:size, 6:size] <- sample(0:1, (size - 5)^2, replace = TRUE)
+    #définir difficulté ici prob=(1-p,p)
+    random_numbers_val[6:size, 6:size] <- sample(c(0,1), prob = c(0.3, 0.7),(size - 5)^2, replace = TRUE)
     random_numbers(random_numbers_val)
     
     # Exclure les 5 premières lignes et colonnes
     num <- random_numbers_val[-c(1:5), -c(1:5)]
     
     #DECOMPTE PAR LIGNE
-    
+    # EN commenant par la fin de la ligne, on aurait pas les 0
     # Initialiser le vecteur de compteurs
     counters_l <- matrix(0, nrow = size - 5, ncol = size - 5)
     
@@ -54,6 +56,7 @@ server <- function(input, output, session) {
     }
     
     #DECOMPTE PAR COLONNE (même principe en inversant les indices)
+    # En créant une fonction sur une matrice on pourrait l'appliquer à la transposée : plus simple peut-être
     counters_c <- matrix(0, nrow = size - 5, ncol = size - 5)
     
     for (j in 1:(size - 5)) {
