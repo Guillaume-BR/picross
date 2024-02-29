@@ -109,14 +109,23 @@ server <- function(input, output, session) {
     })
     
     shinyjs::runjs('
-    $(document).on("click", ".grid_cell", function(){
-    if($(this).css("background-color") === "rgb(255, 255, 255)") {
-      $(this).css("background-color", "black");
+  $(document).on("click", ".grid_cell", function(){
+    var cell = $(this);
+    var currentColor = cell.css("background-color");
+
+    if(currentColor === "rgb(255, 255, 255)" || currentColor === "white") {
+      cell.css("background-color", "black");
+    } else if (currentColor === "rgb(0, 0, 0)" || currentColor === "black") {
+      cell.css("background-color", "red");
     } else {
-      $(this).css("background-color", "white");
+      cell.css("background-color", "white");
+      cell.html(""); // Supprime le contenu de la cellule
     }
-    });
-  ')
+  });
+')
+    
+    
+    
   })
 }
 
