@@ -75,7 +75,7 @@ server <- function(input, output, session) {
       # Inverser les zéros remplacés par une chaîne de caractères vide avec les indices
       counters_c[i,] <- c(c(rep("", length(counters_c[i,][counters_c[i,] == 0]))), counters_c[i,][counters_c[i,] != 0])
       counters_l[i,] <- c(c(rep("", length(counters_l[i,][counters_l[i,] == 0]))), counters_l[i,][counters_l[i,] != 0])
-
+      
       # Equivalent plus compréhensible
       #liste = counters_l[i,]
       #zeros <- length(liste[liste == 0])
@@ -83,7 +83,7 @@ server <- function(input, output, session) {
       #non_zeros <- liste[liste != 0]
       #counters_l[i,] <- c(zeros, non_zeros)
     }
-
+    
     # Transposition de la matrice des indices des colonnes
     counters_ct <- t(counters_c)
     
@@ -92,7 +92,7 @@ server <- function(input, output, session) {
       grid_divs <- lapply(1:size, function(i) {
         lapply(1:size, function(j) {
           # Suppression des bordures hors de la grille de jeu et centrage des indices
-          common_style <- paste("text-align: center; font-weight: bold; margin: 1px;", ifelse(i <= ajout | j <= ajout, "border: none;", "border: 1px solid black;"))
+          common_style <- paste("display: flex; justify-content: center; align-items: center; font-weight: bold; margin: 1px;", ifelse(i <= ajout | j <= ajout, "border: none;", "border: 1px solid black;"))
           
           if (i > ajout & j <= ajout) { # Affichage des indices lignes
             div(
