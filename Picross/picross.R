@@ -34,7 +34,7 @@ server <- function(input, output, session) {
     # Exclure les lignes et colonnes prévues pour les indices
     num <- random_numbers_val[-c(1:ajout), -c(1:ajout)]
     numt <- t(num)
-    #print(num)
+    print(num)
     
     # DECOMPTE DES INDICES
     # Initialiser les matrices des indices
