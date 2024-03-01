@@ -7,39 +7,37 @@ ui <- fluidPage(
   mainPanel(
     fluidRow(
       column(12, align = "center", sliderInput("grid_size", label = "Taille de la grille", value = 5, min = 5, max = 20)), # Choix de la taille de la grille
-      column(10, uiOutput("grid_container")) # Grille totale
+      column(10, uiOutput("grid_container")), # Grille totale
+      column(2, align = "center", actionButton("btn_verifier", "Vérifier")) # Bouton de vérification
     )
   )
 )
 
 server <- function(input, output, session) {
-  
-  # Déclarer random_numbers en tant que variable réactive
-  random_numbers <- reactiveVal(matrix(0, nrow = 1, ncol = 1))
-  decompte_grid <- reactiveVal(NULL)
-  decompte_colonne <- reactiveVal(NULL)
-  
   observeEvent(input$grid_size, {
     # Définir les tailles de grille
     grid_size <- input$grid_size # Taille de la grille de jeu choisie
     ajout <- ceiling(input$grid_size/2) # Taille supplémentaire pour les indices
     size <- grid_size+ajout # Taille de la grille totale
     
+    # Déclarer random_numbers en tant que variable réactive
+    random_numbers <- reactiveVal(matrix(0, nrow = 1, ncol = 1))
+    
     # Générer la matrice random_numbers_val avec des valeurs aléatoires uniquement pour la grille de jeu
     random_numbers_val <- matrix(0, nrow = size, ncol = size)
+    
     # Définir difficulté ici prob=(1-p,p)
-    random_numbers_val[ajout+1:grid_size, ajout+1:grid_size] <- sample(c(0,1), prob = c(0.3, 0.7), grid_size^2, replace = TRUE)
+    random_numbers_val[ajout+1:grid_size, ajout+1:grid_size] <- sample(c(0,1), prob = c(0.4, 0.6), grid_size^2, replace = TRUE)
     random_numbers(random_numbers_val)
     
     # Exclure les lignes et colonnes prévues pour les indices
     num <- random_numbers_val[-c(1:ajout), -c(1:ajout)]
     numt <- t(num)
-    print(num)
+    #print(num)
     
     # DECOMPTE DES INDICES
     # Initialiser les matrices des indices
-    counters_l <- matrix(0, nrow = grid_size, ncol = ajout)
-    counters_c <- matrix(0, nrow = grid_size, ncol = ajout) # Sera transposée par la suite
+    counters_l <- counters_c <- matrix(0, nrow = grid_size, ncol = ajout)
     
     for (i in 1:grid_size) {
       c <- 1
@@ -85,7 +83,7 @@ server <- function(input, output, session) {
     }
     
     # Transposition de la matrice des indices des colonnes
-    counters_ct <- t(counters_c)
+    counters_c <- t(counters_c)
     
     # AFFICHAGE GRILLE
     output$grid_container <- renderUI({
@@ -102,13 +100,13 @@ server <- function(input, output, session) {
           } else if (i <= ajout & j > ajout) { # Affichage des indices colonnes
             div(
               style = common_style,
-              counters_ct[i, j-ajout]
+              counters_c[i, j-ajout]
             )
           } else { # Affichage de la sous-grille de jeu
             div(
               class = "grid_cell", # Classe utilisée pour détecter les clics par la suite
               style = common_style,
-              id = paste("cell_", i, "_", j)
+              id = paste("cell_", i-ajout, "_", j-ajout)
             )
           }
         })
@@ -120,24 +118,64 @@ server <- function(input, output, session) {
       )
     })
     
-    # Détection clic
-    shinyjs::runjs('
-  $(document).on("click", ".grid_cell", function(){
-    var cell = $(this);
-    var currentColor = cell.css("background-color");
-
-    if(currentColor === "rgb(255, 255, 255)" || currentColor === "white") {
-      cell.css("background-color", "black");
-    } else if (currentColor === "rgb(0, 0, 0)" || currentColor === "black") {
-      cell.css("background-color", "red");
-    } else {
-      cell.css("background-color", "white");
+    # Définir la matrice du joueur
+    joueur <- reactiveVal(matrix(0, nrow = grid_size, ncol = grid_size))
+    
+    # Nouvelle fonction pour mettre à jour la matrice du joueur
+    update_player_matrix <- function(i, j) {
+      current_joueur <- joueur()
+      current_joueur[i, j] <- 1
+      joueur(current_joueur)
     }
-  });
-')
     
+    # Détection clic (à corriger : ordres des couleurs buggé et double-clic)
+    shinyjs::runjs('
+    $(document).on("click", ".grid_cell", function(){
+      var cell = $(this);
+      var cellId = cell.attr("id");
+      var coordinates = cellId.split("_");
+      var i = coordinates[1];
+      var j = coordinates[2];
+      var currentColor = cell.css("background-color");
+
+      if(currentColor === "rgb(255, 255, 255)" || currentColor === "white") {
+        cell.css("background-color", "black");
+        Shiny.onInputChange("cell_clicked", {row: i, col: j, color: "black"});
+      } else if (currentColor === "rgb(0, 0, 0)" || currentColor === "black") {
+        cell.css("background-color", "red");
+        Shiny.onInputChange("cell_clicked", {row: i, col: j, color: "red"});
+      } else {
+        cell.css("background-color", "white");
+        Shiny.onInputChange("cell_clicked", {row: i, col: j, color: "white"});
+      }
+    });
+  ')
     
+    # Mise à jour de la matrice du joueur lorsqu'une cellule est cliquée
+    observeEvent(input$cell_clicked, {
+      if (!is.null(input$cell_clicked)) {
+        update_player_matrix(as.numeric(input$cell_clicked$row), as.numeric(input$cell_clicked$col))
+      }
+    })
     
+    # Système de vérification (à corriger : affiche le message d'échec en changeant de taille de grille)
+    observeEvent(input$btn_verifier, {
+      if (!is.null(input$btn_verifier)) {
+        if (identical(joueur(), num)) {
+          showModal(modalDialog(
+            title = "Résultat :",
+            "Félicitations, Vous avez réussi !",
+            easyClose = TRUE
+          ))
+        } else if (!identical(joueur(), num)) {
+          showModal(modalDialog(
+            title = "Résultat :",
+            "Pas si intelligent que ça finalement...",
+            easyClose = TRUE
+          ))
+        }
+      }
+    })
   })
 }
 
