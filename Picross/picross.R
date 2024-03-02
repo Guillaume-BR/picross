@@ -15,7 +15,8 @@ ui <- fluidPage(
   sidebarPanel(
     sliderInput("grid_size", label = "Taille de la grille", value = 5, min = 5, max = 20),
     selectInput('proportion', 'Difficulté', names(niveaux_difficulte)),
-    actionButton("btn_verifier", "Vérification")
+    actionButton("btn_generer", "Générer", disabled = TRUE),
+    actionButton("btn_verifier", "Vérifier")
   ),
   mainPanel(
     uiOutput("grid_container")
@@ -23,12 +24,19 @@ ui <- fluidPage(
 )
 
 server <- function(input, output, session) {
-  observeEvent(input$grid_size, {
+  observeEvent(c(input$proportion, input$grid_size), {
+    # Désactiver le bouton "Générer" tant que la taille de la grille n'est pas choisie
+    shinyjs::disable("btn_generer")
+    
+    # Activer le bouton "Générer" une fois que la taille de la grille est choisie
+    shinyjs::enable("btn_generer")
+  })
+  
+  observeEvent(input$btn_generer, {
     # Définir les tailles de grille
     grid_size <- input$grid_size # Taille de la grille de jeu choisie
     ajout <- ceiling(input$grid_size/2) # Taille supplémentaire pour les indices
     size <- grid_size+ajout # Taille de la grille totale
-    difficulte <- reactive({input$proportion})
     
     # Déclarer random_numbers en tant que variable réactive
     random_numbers <- reactiveVal(matrix(0, nrow = 1, ncol = 1))
@@ -37,9 +45,7 @@ server <- function(input, output, session) {
     random_numbers_val <- matrix(0, nrow = size, ncol = size)
     
     # Définir difficulté ici prob=(1-p,p)
-    
-    
-    p <- niveaux_difficulte[[difficulte()]]
+    p <- niveaux_difficulte[[input$proportion]]
     random_numbers_val[ajout+1:grid_size, ajout+1:grid_size] <- sample(c(0,1), prob = c(1-p, p), grid_size^2, replace = TRUE)
     random_numbers(random_numbers_val)
     
