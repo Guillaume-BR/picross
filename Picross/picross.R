@@ -30,6 +30,7 @@ server <- function(input, output, session) {
     
     # Activer le bouton "Générer" une fois que la taille de la grille est choisie
     shinyjs::enable("btn_generer")
+    shinyjs::disable("btn_verifier")
   })
   
   observeEvent(input$btn_generer, {
@@ -137,6 +138,8 @@ server <- function(input, output, session) {
       )
     })
     
+    shinyjs::enable("btn_verifier")
+    
     # Définir la matrice du joueur
     joueur <- reactiveVal(matrix(0, nrow = grid_size, ncol = grid_size))
     
@@ -172,6 +175,7 @@ server <- function(input, output, session) {
     
     # Mise à jour de la matrice du joueur lorsqu'une cellule est cliquée
     observeEvent(input$cell_clicked, {
+      shinyjs::enable("btn_verifier")
       if (!is.null(input$cell_clicked)) {
         update_player_matrix(as.numeric(input$cell_clicked$row), as.numeric(input$cell_clicked$col))
       }
@@ -186,7 +190,7 @@ server <- function(input, output, session) {
             "Félicitations, Vous avez réussi !",
             easyClose = TRUE
           ))
-        } else if (!identical(joueur(), num)) {
+        } else {
           showModal(modalDialog(
             title = "Résultat :",
             "Pas si intelligent que ça finalement...",
