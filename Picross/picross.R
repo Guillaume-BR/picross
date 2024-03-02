@@ -1,15 +1,24 @@
 library(shiny)
 library(shinyjs)
 
+niveaux_difficulte <- list(
+  Cadeau = 0.9,
+  Facile = 0.7,
+  Moyen = 0.6,
+  Difficile = 0.55,
+  Impossible = 0.5
+)
+
 ui <- fluidPage(
-  titlePanel("Picross"),
   shinyjs::useShinyjs(),
+  headerPanel('Picross'),
+  sidebarPanel(
+    sliderInput("grid_size", label = "Taille de la grille", value = 5, min = 5, max = 20),
+    selectInput('proportion', 'Difficulté', names(niveaux_difficulte)),
+    actionButton("btn_verifier", "Vérification")
+  ),
   mainPanel(
-    fluidRow(
-      column(12, align = "center", sliderInput("grid_size", label = "Taille de la grille", value = 5, min = 5, max = 20)), # Choix de la taille de la grille
-      column(10, uiOutput("grid_container")), # Grille totale
-      column(2, align = "center", actionButton("btn_verifier", "Vérifier")) # Bouton de vérification
-    )
+    uiOutput("grid_container")
   )
 )
 
@@ -19,6 +28,7 @@ server <- function(input, output, session) {
     grid_size <- input$grid_size # Taille de la grille de jeu choisie
     ajout <- ceiling(input$grid_size/2) # Taille supplémentaire pour les indices
     size <- grid_size+ajout # Taille de la grille totale
+    difficulte <- reactive({input$proportion})
     
     # Déclarer random_numbers en tant que variable réactive
     random_numbers <- reactiveVal(matrix(0, nrow = 1, ncol = 1))
@@ -27,7 +37,10 @@ server <- function(input, output, session) {
     random_numbers_val <- matrix(0, nrow = size, ncol = size)
     
     # Définir difficulté ici prob=(1-p,p)
-    random_numbers_val[ajout+1:grid_size, ajout+1:grid_size] <- sample(c(0,1), prob = c(0.4, 0.6), grid_size^2, replace = TRUE)
+    
+    
+    p <- niveaux_difficulte[[difficulte()]]
+    random_numbers_val[ajout+1:grid_size, ajout+1:grid_size] <- sample(c(0,1), prob = c(1-p, p), grid_size^2, replace = TRUE)
     random_numbers(random_numbers_val)
     
     # Exclure les lignes et colonnes prévues pour les indices
@@ -180,5 +193,3 @@ server <- function(input, output, session) {
 }
 
 shinyApp(ui, server)
-
-
