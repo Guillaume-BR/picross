@@ -1,6 +1,7 @@
 library(shiny)
 library(shinyjs)
 
+# Définir les niveaux de difficulté
 niveaux_difficulte <- list(
   Cadeau = 0.9,
   Facile = 0.7,
@@ -8,6 +9,10 @@ niveaux_difficulte <- list(
   Difficile = 0.55,
   Impossible = 0.5
 )
+
+# Définir les futures matrices réactives
+joueur <- reactiveVal(matrix(0, nrow = 1, ncol = 1))
+num <- reactiveVal(matrix(0, nrow = 1, ncol = 1))
 
 ui <- fluidPage(
   shinyjs::useShinyjs(),
@@ -141,7 +146,7 @@ server <- function(input, output, session) {
     shinyjs::enable("btn_verifier")
     
     # Définir la matrice du joueur
-    joueur <- reactiveVal(matrix(0, nrow = grid_size, ncol = grid_size))
+    joueur <- joueur(matrix(0, nrow = grid_size, ncol = grid_size))
     
     # Nouvelle fonction pour mettre à jour la matrice du joueur
     update_player_matrix <- function(i, j) {
@@ -180,25 +185,25 @@ server <- function(input, output, session) {
         update_player_matrix(as.numeric(input$cell_clicked$row), as.numeric(input$cell_clicked$col))
       }
     })
-    
-    # Système de vérification (à corriger : affiche le message d'échec en changeant de taille de grille)
-    observeEvent(input$btn_verifier, {
-      if (!is.null(input$btn_verifier)) {
-        if (identical(joueur(), num)) {
-          showModal(modalDialog(
-            title = "Résultat :",
-            "Félicitations, Vous avez réussi !",
-            easyClose = TRUE
-          ))
-        } else {
-          showModal(modalDialog(
-            title = "Résultat :",
-            "Pas si intelligent que ça finalement...",
-            easyClose = TRUE
-          ))
-        }
+  })
+  
+  # Système de vérification (à corriger : affiche le message d'échec en changeant de taille de grille)
+  observeEvent(input$btn_verifier, {
+    if (!is.null(input$btn_verifier)) {
+      if (identical(joueur(), num)) {
+        showModal(modalDialog(
+          title = "Résultat :",
+          "Félicitations, Vous avez réussi !",
+          easyClose = TRUE
+        ))
+      } else {
+        showModal(modalDialog(
+          title = "Résultat :",
+          "Pas si intelligent que ça finalement...",
+          easyClose = TRUE
+        ))
       }
-    })
+    }
   })
 }
 
