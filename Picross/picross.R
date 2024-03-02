@@ -58,7 +58,7 @@ server <- function(input, output, session) {
     # Exclure les lignes et colonnes prévues pour les indices
     num <- random_numbers_val[-c(1:ajout), -c(1:ajout)]
     numt <- t(num)
-    #print(num)
+    print(num)
     
     # DECOMPTE DES INDICES
     # Initialiser les matrices des indices
@@ -151,8 +151,14 @@ server <- function(input, output, session) {
     # Nouvelle fonction pour mettre à jour la matrice du joueur
     update_player_matrix <- function(i, j) {
       current_joueur <- joueur()
-      current_joueur[i, j] <- 1
+      current_value <- current_joueur[i, j]
+      
+      # Basculement entre 0 et 1
+      new_value <- ifelse(current_value == 0, 1, 0)
+      
+      current_joueur[i, j] <- new_value
       joueur(current_joueur)
+      print(current_joueur)
     }
     
     # Détection clic (à corriger : ordres des couleurs buggé et double-clic)
