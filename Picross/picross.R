@@ -58,7 +58,7 @@ server <- function(input, output, session) {
     # Exclure les lignes et colonnes prévues pour les indices
     num <- random_numbers_val[-c(1:ajout), -c(1:ajout)]
     numt <- t(num)
-    print(num)
+    #print(num)
     
     # DECOMPTE DES INDICES
     # Initialiser les matrices des indices
@@ -127,6 +127,10 @@ server <- function(input, output, session) {
               style = common_style,
               counters_c[i, j-ajout]
             )
+          } else if (i <= ajout & j <= ajout) {
+            div(
+              style = common_style
+            )
           } else { # Affichage de la sous-grille de jeu
             div(
               class = "grid_cell", # Classe utilisée pour détecter les clics par la suite
@@ -154,7 +158,7 @@ server <- function(input, output, session) {
       current_value <- current_joueur[i, j]
       
       # Basculement entre 0 et 1
-      new_value <- ifelse(current_value == 0, 1, 0)
+      new_value <- ifelse(current_value == 0, 1, ifelse(current_value == 1, 2, 0))
       
       current_joueur[i, j] <- new_value
       joueur(current_joueur)
@@ -186,14 +190,12 @@ server <- function(input, output, session) {
     
     # Mise à jour de la matrice du joueur lorsqu'une cellule est cliquée
     observeEvent(input$cell_clicked, {
-      shinyjs::enable("btn_verifier")
-      if (!is.null(input$cell_clicked)) {
-        update_player_matrix(as.numeric(input$cell_clicked$row), as.numeric(input$cell_clicked$col))
-      }
+      update_player_matrix(as.numeric(input$cell_clicked$row), as.numeric(input$cell_clicked$col))
     })
+    
   })
   
-  # Système de vérification (à corriger : affiche le message d'échec en changeant de taille de grille)
+  # Système de vérification
   observeEvent(input$btn_verifier, {
     if (!is.null(input$btn_verifier)) {
       if (identical(joueur(), num)) {
