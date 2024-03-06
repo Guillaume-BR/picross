@@ -127,10 +127,6 @@ server <- function(input, output, session) {
               style = common_style,
               counters_c[i, j-ajout]
             )
-          } else if (i <= ajout & j <= ajout) {
-            div(
-              style = common_style
-            )
           } else { # Affichage de la sous-grille de jeu
             div(
               class = "grid_cell", # Classe utilisée pour détecter les clics par la suite
@@ -150,7 +146,7 @@ server <- function(input, output, session) {
     shinyjs::enable("btn_verifier")
     
     # Définir la matrice du joueur
-    joueur(matrix(0, nrow = grid_size, ncol = grid_size))
+    joueur <- joueur(matrix(0, nrow = grid_size, ncol = grid_size))
     
     # Nouvelle fonction pour mettre à jour la matrice du joueur
     update_player_matrix <- function(i, j) {
@@ -190,27 +186,30 @@ server <- function(input, output, session) {
     
     # Mise à jour de la matrice du joueur lorsqu'une cellule est cliquée
     observeEvent(input$cell_clicked, {
-      update_player_matrix(as.numeric(input$cell_clicked$row), as.numeric(input$cell_clicked$col))
-    })
-  
-    # Système de vérification (à corriger : affiche le message d'échec en changeant de taille de grille)
-    observeEvent(input$btn_verifier, {
-      if (!is.null(input$btn_verifier)) {
-        if (identical(joueur(), num)) {
-          showModal(modalDialog(
-            title = "Résultat :",
-            "Félicitations, Vous avez réussi !",
-            easyClose = TRUE
-          ))
-        } else {
-          showModal(modalDialog(
-            title = "Résultat :",
-            "Pas si intelligent que ça finalement...",
-            easyClose = TRUE
-          ))
-        }
+      shinyjs::enable("btn_verifier")
+      if (!is.null(input$cell_clicked)) {
+        update_player_matrix(as.numeric(input$cell_clicked$row), as.numeric(input$cell_clicked$col))
       }
     })
+  })
+  
+  # Système de vérification (à corriger : affiche le message d'échec en changeant de taille de grille)
+  observeEvent(input$btn_verifier, {
+    if (!is.null(input$btn_verifier)) {
+      if (identical(joueur(), num)) {
+        showModal(modalDialog(
+          title = "Résultat :",
+          "Félicitations, Vous avez réussi !",
+          easyClose = TRUE
+        ))
+      } else {
+        showModal(modalDialog(
+          title = "Résultat :",
+          "Pas si intelligent que ça finalement...",
+          easyClose = TRUE
+        ))
+      }
+    }
   })
 }
 
