@@ -58,7 +58,7 @@ server <- function(input, output, session) {
     # Exclure les lignes et colonnes prévues pour les indices
     num <- random_numbers_val[-c(1:ajout), -c(1:ajout)]
     numt <- t(num)
-    #print(num)
+    print(num)
     
     # DECOMPTE DES INDICES
     # Initialiser les matrices des indices
@@ -150,7 +150,7 @@ server <- function(input, output, session) {
     shinyjs::enable("btn_verifier")
     
     # Définir la matrice du joueur
-    joueur <- joueur(matrix(0, nrow = grid_size, ncol = grid_size))
+    joueur(matrix(0, nrow = grid_size, ncol = grid_size))
     
     # Nouvelle fonction pour mettre à jour la matrice du joueur
     update_player_matrix <- function(i, j) {
@@ -162,7 +162,7 @@ server <- function(input, output, session) {
       
       current_joueur[i, j] <- new_value
       joueur(current_joueur)
-      print(current_joueur)
+      print(joueur())
     }
     
     # Détection clic (à corriger : ordres des couleurs buggé et double-clic)
@@ -192,26 +192,25 @@ server <- function(input, output, session) {
     observeEvent(input$cell_clicked, {
       update_player_matrix(as.numeric(input$cell_clicked$row), as.numeric(input$cell_clicked$col))
     })
-    
-  })
   
-  # Système de vérification
-  observeEvent(input$btn_verifier, {
-    if (!is.null(input$btn_verifier)) {
-      if (identical(joueur(), num)) {
-        showModal(modalDialog(
-          title = "Résultat :",
-          "Félicitations, Vous avez réussi !",
-          easyClose = TRUE
-        ))
-      } else {
-        showModal(modalDialog(
-          title = "Résultat :",
-          "Pas si intelligent que ça finalement...",
-          easyClose = TRUE
-        ))
+    # Système de vérification (à corriger : affiche le message d'échec en changeant de taille de grille)
+    observeEvent(input$btn_verifier, {
+      if (!is.null(input$btn_verifier)) {
+        if (identical(joueur(), num)) {
+          showModal(modalDialog(
+            title = "Résultat :",
+            "Félicitations, Vous avez réussi !",
+            easyClose = TRUE
+          ))
+        } else {
+          showModal(modalDialog(
+            title = "Résultat :",
+            "Pas si intelligent que ça finalement...",
+            easyClose = TRUE
+          ))
+        }
       }
-    }
+    })
   })
 }
 
