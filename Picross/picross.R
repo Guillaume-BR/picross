@@ -10,6 +10,20 @@ niveaux_difficulte <- list(
   Impossible = 0.5
 )
 
+# Nouvelle fonction pour mettre à jour la matrice du joueur
+update_player_matrix <- function(i, j) {
+  current_joueur <- joueur()
+  current_value <- current_joueur[i, j]
+  
+  # Basculement entre 0 et 1
+  new_value <- ifelse(current_value == 0, 1, ifelse(current_value == 1, 2, 0))
+  
+  current_joueur[i, j] <- new_value
+  joueur(current_joueur)
+  print('Séparation !')
+  print(joueur())
+}
+
 # Définir les futures matrices réactives
 joueur <- reactiveVal(matrix(0, nrow = 1, ncol = 1))
 num <- reactiveVal(matrix(0, nrow = 1, ncol = 1))
@@ -32,13 +46,18 @@ server <- function(input, output, session) {
   observeEvent(c(input$proportion, input$grid_size), {
     # Désactiver le bouton "Générer" tant que la taille de la grille n'est pas choisie
     shinyjs::disable("btn_generer")
+    shinyjs::disable("btn_verifier")
+    shinyjs::disable(".grid_cell")  # Désactiver les clics sur les cellules pendant la génération de la grille
+    
     
     # Activer le bouton "Générer" une fois que la taille de la grille est choisie
     shinyjs::enable("btn_generer")
     shinyjs::disable("btn_verifier")
+    shinyjs::enable(".grid_cell")  # Réactiver les clics sur les cellules une fois la grille générée
   })
   
   observeEvent(input$btn_generer, {
+    
     # Définir les tailles de grille
     grid_size <- input$grid_size # Taille de la grille de jeu choisie
     ajout <- ceiling(input$grid_size/2) # Taille supplémentaire pour les indices
@@ -115,7 +134,7 @@ server <- function(input, output, session) {
       grid_divs <- lapply(1:size, function(i) {
         lapply(1:size, function(j) {
           # Suppression des bordures hors de la grille de jeu et centrage des indices
-          common_style <- paste("display: flex; justify-content: center; align-items: center; font-weight: bold; margin: 1px;", ifelse(i <= ajout | j <= ajout, "border: none;", "border: 1px solid black;"))
+          common_style <- paste("display: flex; justify-content: center; align-items: center; font-weight: bold; margin: 1px;", ifelse(i <= ajout | j <= ajout, "border: none;", "border: 1px solid black; background-color: white"))
           
           if (i > ajout & j <= ajout) { # Affichage des indices lignes
             div(
@@ -126,6 +145,10 @@ server <- function(input, output, session) {
             div(
               style = common_style,
               counters_c[i, j-ajout]
+            )
+          } else if (i <= ajout & j <= ajout) { # Affichage des indices colonnes
+            div(
+              style = common_style
             )
           } else { # Affichage de la sous-grille de jeu
             div(
@@ -143,57 +166,44 @@ server <- function(input, output, session) {
       )
     })
     
+    # Définir la matrice du joueur
+    joueur(matrix(0, nrow = grid_size, ncol = grid_size))
+    
     shinyjs::enable("btn_verifier")
     
-    # Définir la matrice du joueur
-    joueur <- joueur(matrix(0, nrow = grid_size, ncol = grid_size))
+  })
     
-    # Nouvelle fonction pour mettre à jour la matrice du joueur
-    update_player_matrix <- function(i, j) {
-      current_joueur <- joueur()
-      current_value <- current_joueur[i, j]
-      
-      # Basculement entre 0 et 1
-      new_value <- ifelse(current_value == 0, 1, ifelse(current_value == 1, 2, 0))
-      
-      current_joueur[i, j] <- new_value
-      joueur(current_joueur)
-      print(joueur())
-    }
     
-    # Détection clic (à corriger : ordres des couleurs buggé et double-clic)
+    # Détection clic
     shinyjs::runjs('
-    $(document).on("click", ".grid_cell", function(){
-      var cell = $(this);
-      var cellId = cell.attr("id");
-      var coordinates = cellId.split("_");
-      var i = coordinates[1];
-      var j = coordinates[2];
-      var currentColor = cell.css("background-color");
-
-      if(currentColor === "rgb(255, 255, 255)" || currentColor === "white") {
-        cell.css("background-color", "black");
-        Shiny.onInputChange("cell_clicked", {row: i, col: j, color: "black"});
-      } else if (currentColor === "rgb(0, 0, 0)" || currentColor === "black") {
-        cell.css("background-color", "red");
-        Shiny.onInputChange("cell_clicked", {row: i, col: j, color: "red"});
-      } else {
-        cell.css("background-color", "white");
-        Shiny.onInputChange("cell_clicked", {row: i, col: j, color: "white"});
-      }
-    });
-  ')
+      $(document).on("click", ".grid_cell", function(){
+        var cell = $(this);
+        var cellId = cell.attr("id").split("_");
+        var i = cellId[1];
+        var j = cellId[2];
+        var currentColor = cell.css("background-color");
+        var newColor;
+    
+        if (currentColor === "rgb(255, 255, 255)" || currentColor === "white") {
+          newColor = "black";
+        } else if (currentColor === "rgb(0, 0, 0)" || currentColor === "black") {
+          newColor = "red";
+        } else {
+          newColor = "white";
+        }
+    
+        cell.css("background-color", newColor);
+        Shiny.onInputChange("cell_clicked", {row: i, col: j, color: newColor});
+      });
+    ')
     
     # Mise à jour de la matrice du joueur lorsqu'une cellule est cliquée
     observeEvent(input$cell_clicked, {
       shinyjs::enable("btn_verifier")
-      if (!is.null(input$cell_clicked)) {
-        update_player_matrix(as.numeric(input$cell_clicked$row), as.numeric(input$cell_clicked$col))
-      }
+      update_player_matrix(as.numeric(input$cell_clicked$row), as.numeric(input$cell_clicked$col))
     })
-  })
   
-  # Système de vérification (à corriger : affiche le message d'échec en changeant de taille de grille)
+  # Système de vérification (à corriger : affiche le message ds'échec en changeant de taille de grille)
   observeEvent(input$btn_verifier, {
     if (!is.null(input$btn_verifier)) {
       if (identical(joueur(), num)) {
