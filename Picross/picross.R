@@ -4,10 +4,10 @@ library(shinyjs)
 # Définir les niveaux de difficulté
 niveaux_difficulte <- list(
   Cadeau = 0.9,
-  Facile = 0.7,
-  Moyen = 0.6,
-  Difficile = 0.55,
-  Impossible = 0.5
+  Facile = 0.825,
+  Moyen = 0.75,
+  Difficile = 0.675,
+  Impossible = 0.6
 )
 
 # Nouvelle fonction pour mettre à jour la matrice du joueur
@@ -20,6 +20,14 @@ update_player_matrix <- function(i, j) {
   
   current_joueur[i, j] <- new_value
   joueur(current_joueur)
+}
+
+# Fonction pour vérifier les positions des "1" dans les matrices
+verifier_positions <- function(matrice1, matrice2) {
+  positions_matrice1 <- which(matrice1 == 1, arr.ind = TRUE)
+  positions_matrice2 <- which(matrice2 == 1, arr.ind = TRUE)
+  
+  return(identical(positions_matrice1, positions_matrice2))
 }
 
 # Définir les futures matrices réactives
@@ -76,7 +84,7 @@ server <- function(input, output, session) {
     numr(random_numbers_val[-c(1:ajout), -c(1:ajout)])
     num <- random_numbers_val[-c(1:ajout), -c(1:ajout)]
     n <- 
-    numt <- t(num)
+      numt <- t(num)
     print(num)
     
     # DECOMPTE DES INDICES
@@ -207,7 +215,7 @@ server <- function(input, output, session) {
   
   # Système de vérification (à corriger : affiche le message d'échec en changeant de taille de grille)
   observeEvent(input$btn_verifier, {
-    if (identical(joueur(), numr())) {
+    if (verifier_positions(numr(), joueur())) {
       response <- showModal(modalDialog(
         title = "Résultat :",
         "Félicitations, Vous avez réussi !",
