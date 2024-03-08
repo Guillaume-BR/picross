@@ -37,14 +37,26 @@ blaguer <- reactiveVal(1)
 
 ui <- fluidPage(
   shinyjs::useShinyjs(),
+  
+  # Header
   headerPanel('Picross'),
+  
+  # Sidebar
   sidebarPanel(
-    sliderInput("grid_size", label = "Taille de la grille", value = 5, min = 5, max = 20),
-    selectInput('proportion', 'Difficulté', names(niveaux_difficulte)),
-    actionButton("btn_generer", "Générer", disabled = TRUE),
-    actionButton("btn_verifier", "Vérifier"),
-    actionButton("btn_reset", "Recommencer")
+    wellPanel(
+      sliderInput("grid_size", label = "Taille de la grille", value = 5, min = 5, max = 20),
+      selectInput('proportion', 'Difficulté', names(niveaux_difficulte))
+    ),
+    
+    wellPanel(
+      actionButton("btn_generer", "Générer", class = "btn-primary", disabled = TRUE),
+      actionButton("btn_verifier", "Vérifier", class = "btn-success"),
+      actionButton("btn_quitter", "Quitter", class = "btn-danger"),
+      actionButton("btn_reset", "Recommencer", class = "btn-warning")
+    )
   ),
+  
+  # Main Panel
   mainPanel(
     uiOutput("grid_container")
   )
