@@ -20,13 +20,12 @@ update_player_matrix <- function(i, j) {
   
   current_joueur[i, j] <- new_value
   joueur(current_joueur)
-  print('Séparation !')
-  print(joueur())
 }
 
 # Définir les futures matrices réactives
 joueur <- reactiveVal(matrix(0, nrow = 1, ncol = 1))
-num <- reactiveVal(matrix(0, nrow = 1, ncol = 1))
+numr <-  reactiveVal(matrix(0, nrow = 1, ncol = 1))
+blaguer <- reactiveVal(1)
 
 ui <- fluidPage(
   shinyjs::useShinyjs(),
@@ -43,20 +42,19 @@ ui <- fluidPage(
 )
 
 server <- function(input, output, session) {
+  shinyjs::disable("btn_verifier")
   observeEvent(c(input$proportion, input$grid_size), {
     # Désactiver le bouton "Générer" tant que la taille de la grille n'est pas choisie
     shinyjs::disable("btn_generer")
-    shinyjs::disable("btn_verifier")
-    shinyjs::disable(".grid_cell")  # Désactiver les clics sur les cellules pendant la génération de la grille
     
     
     # Activer le bouton "Générer" une fois que la taille de la grille est choisie
     shinyjs::enable("btn_generer")
-    shinyjs::disable("btn_verifier")
-    shinyjs::enable(".grid_cell")  # Réactiver les clics sur les cellules une fois la grille générée
   })
   
   observeEvent(input$btn_generer, {
+    blague <- 1
+    blaguer(blague)
     
     # Définir les tailles de grille
     grid_size <- input$grid_size # Taille de la grille de jeu choisie
@@ -75,7 +73,9 @@ server <- function(input, output, session) {
     random_numbers(random_numbers_val)
     
     # Exclure les lignes et colonnes prévues pour les indices
+    numr(random_numbers_val[-c(1:ajout), -c(1:ajout)])
     num <- random_numbers_val[-c(1:ajout), -c(1:ajout)]
+    n <- 
     numt <- t(num)
     print(num)
     
@@ -131,6 +131,7 @@ server <- function(input, output, session) {
     
     # AFFICHAGE GRILLE
     output$grid_container <- renderUI({
+      
       grid_divs <- lapply(1:size, function(i) {
         lapply(1:size, function(j) {
           # Suppression des bordures hors de la grille de jeu et centrage des indices
@@ -164,6 +165,7 @@ server <- function(input, output, session) {
         style = paste("width: 500px; height: 500px; display: grid; grid-template-columns: repeat(", size, ", 1fr); grid-template-rows: repeat(", size, ", 1fr);"),
         grid_divs
       )
+      
     })
     
     # Définir la matrice du joueur
@@ -172,10 +174,10 @@ server <- function(input, output, session) {
     shinyjs::enable("btn_verifier")
     
   })
-    
-    
-    # Détection clic
-    shinyjs::runjs('
+  
+  
+  # Détection clic
+  shinyjs::runjs('
       $(document).on("click", ".grid_cell", function(){
         var cell = $(this);
         var cellId = cell.attr("id").split("_");
@@ -196,31 +198,66 @@ server <- function(input, output, session) {
         Shiny.onInputChange("cell_clicked", {row: i, col: j, color: newColor});
       });
     ')
-    
-    # Mise à jour de la matrice du joueur lorsqu'une cellule est cliquée
-    observeEvent(input$cell_clicked, {
-      shinyjs::enable("btn_verifier")
-      update_player_matrix(as.numeric(input$cell_clicked$row), as.numeric(input$cell_clicked$col))
-    })
   
-  # Système de vérification (à corriger : affiche le message ds'échec en changeant de taille de grille)
-  observeEvent(input$btn_verifier, {
-    if (!is.null(input$btn_verifier)) {
-      if (identical(joueur(), num)) {
-        showModal(modalDialog(
-          title = "Résultat :",
-          "Félicitations, Vous avez réussi !",
-          easyClose = TRUE
-        ))
-      } else {
-        showModal(modalDialog(
-          title = "Résultat :",
-          "Pas si intelligent que ça finalement...",
-          easyClose = TRUE
-        ))
-      }
-    }
+  # Mise à jour de la matrice du joueur lorsqu'une cellule est cliquée
+  observeEvent(input$cell_clicked, {
+    shinyjs::enable("btn_verifier")
+    update_player_matrix(as.numeric(input$cell_clicked$row), as.numeric(input$cell_clicked$col))
   })
+  
+  # Système de vérification (à corriger : affiche le message d'échec en changeant de taille de grille)
+  observeEvent(input$btn_verifier, {
+    if (identical(joueur(), numr())) {
+      response <- showModal(modalDialog(
+        title = "Résultat :",
+        "Félicitations, Vous avez réussi !",
+        easyClose = TRUE,
+        footer = tagList(
+          actionButton("btn_rejouer", "Rejouer"),
+          actionButton("btn_quitter", "Quitter")
+        )
+      ))
+    } else if (blaguer() == 1) {
+      response <- showModal(modalDialog(
+        title = "Résultat :",
+        "Raté du premier coup !",
+        easyClose = TRUE,
+        footer = tagList(
+          actionButton("btn_continuer", "Continuer"),
+          actionButton("btn_quitter", "Quitter")
+        )
+      ))
+    } else {
+      response <- showModal(modalDialog(
+        title = "Résultat :",
+        paste("Raté en", blaguer(), "coups !"),
+        easyClose = TRUE,
+        footer = tagList(
+          actionButton("btn_continuer", "Continuer"),
+          actionButton("btn_quitter", "Quitter")
+        )
+      ))
+    }
+    
+    blaguer(blaguer() + 1)
+  })
+  
+  observeEvent(input$btn_rejouer, {
+    output$grid_container <- renderUI({
+      NULL
+    })
+    removeModal()
+  })
+  
+  observeEvent(input$btn_continuer, {
+    removeModal()
+  })
+  
+  observeEvent(input$btn_quitter, {
+    # Quitter l'application
+    stopApp()
+  })
+  
 }
 
 shinyApp(ui, server)
