@@ -42,7 +42,8 @@ ui <- fluidPage(
     sliderInput("grid_size", label = "Taille de la grille", value = 5, min = 5, max = 20),
     selectInput('proportion', 'Difficulté', names(niveaux_difficulte)),
     actionButton("btn_generer", "Générer", disabled = TRUE),
-    actionButton("btn_verifier", "Vérifier")
+    actionButton("btn_verifier", "Vérifier"),
+    actionButton("btn_reset", "Recommencer")
   ),
   mainPanel(
     uiOutput("grid_container")
@@ -83,9 +84,7 @@ server <- function(input, output, session) {
     # Exclure les lignes et colonnes prévues pour les indices
     numr(random_numbers_val[-c(1:ajout), -c(1:ajout)])
     num <- random_numbers_val[-c(1:ajout), -c(1:ajout)]
-    n <- 
-      numt <- t(num)
-    print(num)
+    numt <- t(num)
     
     # DECOMPTE DES INDICES
     # Initialiser les matrices des indices
@@ -264,6 +263,12 @@ server <- function(input, output, session) {
   observeEvent(input$btn_quitter, {
     # Quitter l'application
     stopApp()
+  })
+  
+  observeEvent(input$btn_reset, {
+    # Réinitialiser la grille avec les paramètres
+    joueur(matrix(0, nrow = input$grid_size, ncol = input$grid_size))
+    shinyjs::runjs('$(".grid_cell").css("background-color", "white");')
   })
   
 }
