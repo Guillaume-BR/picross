@@ -3,11 +3,11 @@ library(shinyjs)
 
 # Définir les niveaux de difficulté
 niveaux_difficulte <- list(
-  Cadeau = 0.9,
-  Facile = 0.825,
-  Moyen = 0.75,
-  Difficile = 0.675,
-  Impossible = 0.6
+  Cadeau = 0.85,
+  Facile = 0.775,
+  Moyen = 0.7,
+  Difficile = 0.625,
+  Impossible = 0.55
 )
 
 # Nouvelle fonction pour mettre à jour la matrice du joueur
@@ -35,6 +35,7 @@ joueur <- reactiveVal(matrix(0, nrow = 1, ncol = 1))
 numr <-  reactiveVal(matrix(0, nrow = 1, ncol = 1))
 blaguer <- reactiveVal(1)
 
+# Interface
 ui <- fluidPage(
   shinyjs::useShinyjs(),
   
@@ -51,8 +52,8 @@ ui <- fluidPage(
     wellPanel(
       actionButton("btn_generer", "Générer", class = "btn-primary", disabled = TRUE),
       actionButton("btn_verifier", "Vérifier", class = "btn-success"),
-      actionButton("btn_quitter", "Quitter", class = "btn-danger"),
-      actionButton("btn_reset", "Recommencer", class = "btn-warning")
+      actionButton("btn_reset", "Recommencer", class = "btn-warning"),
+      actionButton("btn_quitter", "Quitter", class = "btn-danger")
     )
   ),
   
@@ -63,7 +64,10 @@ ui <- fluidPage(
 )
 
 server <- function(input, output, session) {
+  # Bloquer la vérification tant que la génération n'est pas réalisée
   shinyjs::disable("btn_verifier")
+  
+  # Déblocage bouton de génération en choisissant les paramètres
   observeEvent(c(input$proportion, input$grid_size), {
     # Désactiver le bouton "Générer" tant que la taille de la grille n'est pas choisie
     shinyjs::disable("btn_generer")
@@ -73,6 +77,7 @@ server <- function(input, output, session) {
     shinyjs::enable("btn_generer")
   })
   
+  # Génération de la grille
   observeEvent(input$btn_generer, {
     blague <- 1
     blaguer(blague)
@@ -82,16 +87,12 @@ server <- function(input, output, session) {
     ajout <- ceiling(input$grid_size/2) # Taille supplémentaire pour les indices
     size <- grid_size+ajout # Taille de la grille totale
     
-    # Déclarer random_numbers en tant que variable réactive
-    random_numbers <- reactiveVal(matrix(0, nrow = 1, ncol = 1))
-    
     # Générer la matrice random_numbers_val avec des valeurs aléatoires uniquement pour la grille de jeu
     random_numbers_val <- matrix(0, nrow = size, ncol = size)
     
     # Définir difficulté ici prob=(1-p,p)
     p <- niveaux_difficulte[[input$proportion]]
     random_numbers_val[ajout+1:grid_size, ajout+1:grid_size] <- sample(c(0,1), prob = c(1-p, p), grid_size^2, replace = TRUE)
-    random_numbers(random_numbers_val)
     
     # Exclure les lignes et colonnes prévues pour les indices
     numr(random_numbers_val[-c(1:ajout), -c(1:ajout)])
@@ -166,15 +167,15 @@ server <- function(input, output, session) {
               style = common_style,
               counters_c[i, j-ajout]
             )
-          } else if (i <= ajout & j <= ajout) { # Affichage des indices colonnes
+          } else if (i <= ajout & j <= ajout) { # Invisibiliser la sous-grille supérieure gauche
             div(
               style = common_style
             )
           } else { # Affichage de la sous-grille de jeu
             div(
-              class = "grid_cell", # Classe utilisée pour détecter les clics par la suite
+              class = "grid_cell",
               style = common_style,
-              id = paste("cell_", i-ajout, "_", j-ajout)
+              id = paste("cell_", i-ajout, "_", j-ajout) # id unique par case
             )
           }
         })
@@ -190,12 +191,13 @@ server <- function(input, output, session) {
     # Définir la matrice du joueur
     joueur(matrix(0, nrow = grid_size, ncol = grid_size))
     
+    # Débloquer le bouton de vérification une fois la génération terminée
     shinyjs::enable("btn_verifier")
     
   })
   
   
-  # Détection clic
+  # Détection et coloration des cases cliquées
   shinyjs::runjs('
       $(document).on("click", ".grid_cell", function(){
         var cell = $(this);
@@ -220,11 +222,10 @@ server <- function(input, output, session) {
   
   # Mise à jour de la matrice du joueur lorsqu'une cellule est cliquée
   observeEvent(input$cell_clicked, {
-    shinyjs::enable("btn_verifier")
     update_player_matrix(as.numeric(input$cell_clicked$row), as.numeric(input$cell_clicked$col))
   })
   
-  # Système de vérification (à corriger : affiche le message d'échec en changeant de taille de grille)
+  # Système de vérification
   observeEvent(input$btn_verifier, {
     if (verifier_positions(numr(), joueur())) {
       response <- showModal(modalDialog(
@@ -233,7 +234,7 @@ server <- function(input, output, session) {
         easyClose = TRUE,
         footer = tagList(
           actionButton("btn_rejouer", "Rejouer"),
-          actionButton("btn_quitter", "Quitter")
+          actionButton("btn_arreter", "Quitter")
         )
       ))
     } else if (blaguer() == 1) {
@@ -243,7 +244,7 @@ server <- function(input, output, session) {
         easyClose = TRUE,
         footer = tagList(
           actionButton("btn_continuer", "Continuer"),
-          actionButton("btn_quitter", "Quitter")
+          actionButton("btn_arreter", "Quitter")
         )
       ))
     } else {
@@ -253,7 +254,7 @@ server <- function(input, output, session) {
         easyClose = TRUE,
         footer = tagList(
           actionButton("btn_continuer", "Continuer"),
-          actionButton("btn_quitter", "Quitter")
+          actionButton("btn_arreter", "Quitter")
         )
       ))
     }
@@ -261,6 +262,7 @@ server <- function(input, output, session) {
     blaguer(blaguer() + 1)
   })
   
+  # Système de rejouabilité
   observeEvent(input$btn_rejouer, {
     output$grid_container <- renderUI({
       NULL
@@ -268,17 +270,23 @@ server <- function(input, output, session) {
     removeModal()
   })
   
+  # Continuer le jeu
   observeEvent(input$btn_continuer, {
     removeModal()
   })
   
+  # Quitter l'application
   observeEvent(input$btn_quitter, {
-    # Quitter l'application
     stopApp()
   })
   
+  # Quitter l'application
+  observeEvent(input$btn_arreter, {
+    stopApp()
+  })
+  
+  # Réinitialiser la grille
   observeEvent(input$btn_reset, {
-    # Réinitialiser la grille avec les paramètres
     joueur(matrix(0, nrow = input$grid_size, ncol = input$grid_size))
     shinyjs::runjs('$(".grid_cell").css("background-color", "white");')
   })
