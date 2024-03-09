@@ -34,6 +34,7 @@ verifier_positions <- function(matrice1, matrice2) {
 joueur <- reactiveVal(matrix(0, nrow = 1, ncol = 1))
 numr <-  reactiveVal(matrix(0, nrow = 1, ncol = 1))
 blaguer <- reactiveVal(1)
+timer <- reactiveVal(0)
 
 # Interface
 ui <- fluidPage(
@@ -46,7 +47,8 @@ ui <- fluidPage(
   sidebarPanel(
     wellPanel(
       sliderInput("grid_size", label = "Taille de la grille", value = 5, min = 5, max = 20),
-      selectInput('proportion', 'Difficulté', names(niveaux_difficulte))
+      selectInput('proportion', 'Difficulté', names(niveaux_difficulte)),
+      textOutput('time')
     ),
     
     wellPanel(
@@ -67,6 +69,25 @@ server <- function(input, output, session) {
   # Bloquer la vérification tant que la génération n'est pas réalisée
   shinyjs::disable("btn_verifier")
   
+  # Initialize the timer , not active.
+  active <- reactiveVal(FALSE)
+  
+  # Output the time 
+  output$time <- renderText({
+    paste("Temps : ", timer() ," S")
+  })
+  
+  # observer that invalidates every second. If timer is active, decrease by one.
+  observe({
+    invalidateLater(1000, session)
+    isolate({
+      if(active() == TRUE)
+      {
+        timer(timer()+1)
+      }
+    })
+  })
+  
   # Déblocage bouton de génération en choisissant les paramètres
   observeEvent(c(input$proportion, input$grid_size), {
     # Désactiver le bouton "Générer" tant que la taille de la grille n'est pas choisie
@@ -79,6 +100,8 @@ server <- function(input, output, session) {
   
   # Génération de la grille
   observeEvent(input$btn_generer, {
+    timer(0)
+    active(TRUE)
     blague <- 1
     blaguer(blague)
     
@@ -227,10 +250,11 @@ server <- function(input, output, session) {
   
   # Système de vérification
   observeEvent(input$btn_verifier, {
+    active(FALSE)
     if (verifier_positions(numr(), joueur())) {
       response <- showModal(modalDialog(
         title = "Résultat :",
-        "Félicitations, Vous avez réussi !",
+        paste("Félicitations, Vous avez réussi en ", timer() , "secondes !" ),
         easyClose = TRUE,
         footer = tagList(
           actionButton("btn_rejouer", "Rejouer"),
@@ -258,12 +282,13 @@ server <- function(input, output, session) {
         )
       ))
     }
-    
     blaguer(blaguer() + 1)
   })
   
   # Système de rejouabilité
   observeEvent(input$btn_rejouer, {
+    timer(0)
+    reactive(FALSE)
     output$grid_container <- renderUI({
       NULL
     })
@@ -273,20 +298,24 @@ server <- function(input, output, session) {
   # Continuer le jeu
   observeEvent(input$btn_continuer, {
     removeModal()
+    reactive(TRUE)
   })
   
   # Quitter l'application
   observeEvent(input$btn_quitter, {
+    timer(0)
     stopApp()
   })
   
   # Quitter l'application
   observeEvent(input$btn_arreter, {
+    timer(0)
     stopApp()
   })
   
   # Réinitialiser la grille
   observeEvent(input$btn_reset, {
+    timer(0)
     joueur(matrix(0, nrow = input$grid_size, ncol = input$grid_size))
     shinyjs::runjs('$(".grid_cell").css("background-color", "white");')
   })
