@@ -63,6 +63,7 @@ ui <- fluidPage(
   mainPanel(
     tabsetPanel(
       tabPanel(title = "La grille",
+               textOutput("defaut"),
                uiOutput("grid_container")
       ),
       tabPanel(title = "Règle",
@@ -82,6 +83,11 @@ server <- function(input, output, session) {
   # Output the time 
   output$time <- renderText({
     paste("Temps : ", timer() ," S")
+  })
+  
+  # Message du début
+  output$defaut <- renderText({
+    "Choisissez une taille de grille et un niveau puis cliquez sur Générer"
   })
   
   output$regle <- renderText({
