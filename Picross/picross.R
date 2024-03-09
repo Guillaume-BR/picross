@@ -61,7 +61,14 @@ ui <- fluidPage(
   
   # Main Panel
   mainPanel(
-    uiOutput("grid_container")
+    tabsetPanel(
+      tabPanel(title = "La grille",
+               uiOutput("grid_container")
+      ),
+      tabPanel(title = "Règle",
+               textOutput("regle")
+      )
+    )
   )
 )
 
@@ -75,6 +82,14 @@ server <- function(input, output, session) {
   # Output the time 
   output$time <- renderText({
     paste("Temps : ", timer() ," S")
+  })
+  
+  output$regle <- renderText({
+    "Le but d’un picross est de noircir les cases de la grille selon des indications.\n
+Les nombres présents à gauche de la grille indiquent le nombre de cases à noircir sur la ligne correspondante.\n
+Les nombres présents en haut de la grille indiquent le nombre de cases à noircir sur la colonne correspondante.\n
+La séquence 5 2 signifie qu’il y a au moins une case vide (blanche) entre une séquence de cinq cases à la suite à noircir et une autre séquence de deux cases à la suite à noircir.\n
+Lorsqu’il y a une séquence donnée elle est dans le bon ordre."
   })
   
   # observer that invalidates every second. If timer is active, decrease by one.
