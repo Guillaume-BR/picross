@@ -106,7 +106,7 @@ server <- function(input, output, session) {
   
   
   
-  # observer that invalidates every second. If timer is active, increase by one.
+  #If timer is active, increase by one.
   observe({
     invalidateLater(1000, session)
     isolate({
@@ -275,7 +275,6 @@ server <- function(input, output, session) {
   
   # Système de vérification
   observeEvent(input$btn_verifier, {
-    active(FALSE)
     if (verifier_positions(numr(), joueur())) {
       response <- showModal(modalDialog(
         title = "Résultat :",
