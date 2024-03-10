@@ -52,9 +52,12 @@ ui <- fluidPage(
     ),
     
     wellPanel(
-      actionButton("btn_generer", "Générer", class = "btn-primary", disabled = TRUE),
+      actionButton("btn_generer", "Générer", class = "btn-primary"),
+      tags$style(HTML(".action-button { margin-right: 30px; }")),
       actionButton("btn_verifier", "Vérifier", class = "btn-success"),
+      tags$style(HTML(".action-button { margin-right: 30px; }")),
       actionButton("btn_reset", "Recommencer", class = "btn-warning"),
+      tags$style(HTML(".action-button { margin-right: 30px; }")),
       actionButton("btn_quitter", "Quitter", class = "btn-danger")
     )
   ),
@@ -67,38 +70,43 @@ ui <- fluidPage(
                uiOutput("grid_container")
       ),
       tabPanel(title = "Règle",
-               textOutput("regle")
+               htmlOutput("regle")
       )
     )
   )
 )
 
 server <- function(input, output, session) {
-  # Bloquer la vérification tant que la génération n'est pas réalisée
-  shinyjs::disable("btn_verifier")
+  observe({
+    shinyjs::runjs('$("#btn_generer").click();')
+  })
   
-  # Initialize the timer , not active.
+  # Initialiser le timer, non actif.
   active <- reactiveVal(FALSE)
   
-  # Output the time 
+  # Affichage du temps 
   output$time <- renderText({
     paste("Temps : ", timer() ," S")
   })
   
   # Message du début
   output$defaut <- renderText({
-    "Choisissez une taille de grille et un niveau puis cliquez sur Générer"
+    "Choisissez une taille de grille et un niveau puis cliquez sur Générer."
   })
   
   output$regle <- renderText({
-    "Le but d’un picross est de noircir les cases de la grille selon des indications.\n
-Les nombres présents à gauche de la grille indiquent le nombre de cases à noircir sur la ligne correspondante.\n
-Les nombres présents en haut de la grille indiquent le nombre de cases à noircir sur la colonne correspondante.\n
-La séquence 5 2 signifie qu’il y a au moins une case vide (blanche) entre une séquence de cinq cases à la suite à noircir et une autre séquence de deux cases à la suite à noircir.\n
-Lorsqu’il y a une séquence donnée elle est dans le bon ordre."
+    return(
+      "<p>Le but d’un picross est de noircir les cases de la grille selon des indications.</p>
+      <p>Les nombres présents à gauche de la grille indiquent le nombre de cases à noircir sur la ligne correspondante.</p>
+      <p>Les nombres présents en haut de la grille indiquent le nombre de cases à noircir sur la colonne correspondante.</p>
+      <p>La séquence 5 2 signifie qu’il y a au moins une case vide (blanche) entre une séquence de cinq cases à la suite à noircir et une autre séquence de deux cases à la suite à noircir.</p>
+      <p>Lorsqu’il y a une séquence donnée, elle est dans le bon ordre.</p>"
+    )
   })
   
-  # observer that invalidates every second. If timer is active, decrease by one.
+  
+  
+  # observer that invalidates every second. If timer is active, increase by one.
   observe({
     invalidateLater(1000, session)
     isolate({
@@ -109,7 +117,7 @@ Lorsqu’il y a une séquence donnée elle est dans le bon ordre."
     })
   })
   
-  # Déblocage bouton de génération en choisissant les paramètres
+  # Déblocage du bouton de génération en choisissant les paramètres
   observeEvent(c(input$proportion, input$grid_size), {
     # Désactiver le bouton "Générer" tant que la taille de la grille n'est pas choisie
     shinyjs::disable("btn_generer")
@@ -195,7 +203,6 @@ Lorsqu’il y a une séquence donnée elle est dans le bon ordre."
     
     # AFFICHAGE GRILLE
     output$grid_container <- renderUI({
-      
       grid_divs <- lapply(1:size, function(i) {
         lapply(1:size, function(j) {
           # Suppression des bordures hors de la grille de jeu et centrage des indices
@@ -234,9 +241,6 @@ Lorsqu’il y a une séquence donnée elle est dans le bon ordre."
     
     # Définir la matrice du joueur
     joueur(matrix(0, nrow = grid_size, ncol = grid_size))
-    
-    # Débloquer le bouton de vérification une fois la génération terminée
-    shinyjs::enable("btn_verifier")
     
   })
   
@@ -314,6 +318,9 @@ Lorsqu’il y a une séquence donnée elle est dans le bon ordre."
       NULL
     })
     removeModal()
+    observe({
+      shinyjs::runjs('$("#btn_generer").click();')
+    })
   })
   
   # Continuer le jeu
@@ -330,13 +337,11 @@ Lorsqu’il y a une séquence donnée elle est dans le bon ordre."
   
   # Quitter l'application
   observeEvent(input$btn_arreter, {
-    timer(0)
     stopApp()
   })
   
   # Réinitialiser la grille
   observeEvent(input$btn_reset, {
-    timer(0)
     joueur(matrix(0, nrow = input$grid_size, ncol = input$grid_size))
     shinyjs::runjs('$(".grid_cell").css("background-color", "white");')
   })
