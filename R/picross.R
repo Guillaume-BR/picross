@@ -11,6 +11,14 @@ niveaux_difficulte <- list(
 )
 
 # Nouvelle fonction pour mettre à jour la matrice du joueur
+#' Mets à jour la matrice du joueur
+#' @param i indice ligne.
+#' @param j indice colonne.
+#' @returns A matrix.
+#' @examples
+#' update_player_matrix(1, 1)
+#' update_player_matrix(3, 4)
+
 update_player_matrix <- function(i, j) {
   current_joueur <- joueur()
   current_value <- current_joueur[i, j]
@@ -23,12 +31,7 @@ update_player_matrix <- function(i, j) {
 }
 
 # Fonction pour vérifier les positions des "1" dans les matrices
-verifier_positions <- function(matrice1, matrice2) {
-  positions_matrice1 <- which(matrice1 == 1, arr.ind = TRUE)
-  positions_matrice2 <- which(matrice2 == 1, arr.ind = TRUE)
-  
-  return(identical(positions_matrice1, positions_matrice2))
-}
+source("verif_pos.R")
 
 # Définir les futures matrices réactives
 joueur <- reactiveVal(matrix(0, nrow = 1, ncol = 1))
