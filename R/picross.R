@@ -18,6 +18,7 @@ niveaux_difficulte <- list(
 #' @examples
 #' update_player_matrix(1, 1)
 #' update_player_matrix(3, 4)
+#' @export
 
 update_player_matrix <- function(i, j) {
   current_joueur <- joueur()
@@ -344,6 +345,8 @@ server <- function(input, output, session) {
   
   # Réinitialiser la grille
   observeEvent(input$btn_reset, {
+    timer(0)
+    reactive(FALSE)
     joueur(matrix(0, nrow = input$grid_size, ncol = input$grid_size))
     shinyjs::runjs('$(".grid_cell").css("background-color", "white");')
   })
