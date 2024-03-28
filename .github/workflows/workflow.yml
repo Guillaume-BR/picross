@@ -20,6 +20,10 @@ jobs:
       run: |
         Rscript -e 'install.packages(c("shiny", "shinyjs", "rsconnect"))'
 
+    - name: Reinstall rsconnect
+      run: |
+        Rscript -e 'install.packages("rsconnect", dependencies = TRUE, repos = "https://cran.rstudio.com/")'
+
     - name: Deploy to ShinyApps.io
       run: Rscript -e 'rsconnect::deployApp(appDir = "./R")'
       env:
