@@ -18,9 +18,13 @@ jobs:
 
     - name: Install dependencies
       run: |
-        Rscript -e 'install.packages(c("shiny", "shinyjs"))'
+        Rscript -e 'install.packages(c("shiny", "shinyjs", "rsconnect"))'
+
+    - name: Generate manifest
+      run: Rscript -e 'rsconnect::writeManifest(appDir = "./R")'
 
     - name: Deploy to ShinyApps.io
-      run: Rscript -e 'shiny::deployApp(appDir = "./R")'
+      run: Rscript -e 'rsconnect::deployApp(appDir = "./R")'
       env:
-        SHINYAPPS_IO_TOKEN: ${{ secrets.D07E2703FD7F84326202442F3EE25639 }}
+        RSHINYAPP_USERNAME: ${{ secrets.maxencelamure }}
+        RSHINYAPP_PASSWORD: ${{ secrets.D07E2703FD7F84326202442F3EE25639 }}
