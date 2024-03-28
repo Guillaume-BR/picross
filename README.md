@@ -1,3 +1,3 @@
 # picross
 
-lien du picross : https://maxencelamure.shinyapps.io/Picross/
+lien du picross : <https://maxencelamure.shinyapps.io/Picross/>
