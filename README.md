@@ -15,7 +15,6 @@ Assurez-vous que votre système dispose des éléments suivants :
 Téléchargez le fichier picross.tar.gz sur votre système. Placez-le dans un répertoire où vous souhaitez installer le programme. Ensuite, extrayez le contenu de l'archive en utilisant la commande suivante dans un terminal (ou utilisez un logiciel d'extraction d'archives graphique si vous êtes sous Windows) :
 
 En Bash :
-
 tar -zxvf picross.tar.gz
 
 Cela extraira les fichiers dans un dossier nommé "picross".
