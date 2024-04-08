@@ -1,5 +1,6 @@
 library(shiny)
 library(shinyjs)
+library(rsconnect)
 
 # Définir les niveaux de difficulté
 niveaux_difficulte <- list(
@@ -354,3 +355,4 @@ server <- function(input, output, session) {
 }
 
 shinyApp(ui, server)
+
