@@ -2,6 +2,12 @@
 
 Voici les étapes pour installer le package picross en local sur votre machine et y jouer :
 
+## Première solution : directement en ligne :  
+
+<https://maxencelamure.shinyapps.io/Picross/>
+
+## Deuxième solution : à l'aide du fichier tar.gz
+
 **Étape 1 : Prérequis**
 
 Assurez-vous que votre système dispose des éléments suivants :
@@ -36,9 +42,13 @@ Dans Bash :
 Rscript picross.R
 
 **Étape 5 : Utilisation**
+Dans bash, une URL vous est fournie, vous n'avez plus qu'à l'ouvrir dans un terminal.
 
-Votre programme devrait maintenant être prêt à être utilisé. Suivez les instructions spécifiques à votre programme ou à votre application pour commencer à l'utiliser.
+## Troisième solution : en installant le package
 
-Ou bien si vous pouvez tout simplement jouer en ligne directement :
+**Etape 1 :**  
+Dans R, tapez la commande :  
+devtools::install_github("Guillaume-BR/picross")
 
-lien du picross : <https://maxencelamure.shinyapps.io/Picross/>
+**Etape 2 :**
+...
