@@ -24,7 +24,7 @@ Cela extraira les fichiers dans un dossier nommé "picross".
 Assurez-vous d'avoir installé toutes les dépendances nécessaires. shiny and shinyjs : 
 
 Dans R :  
-install.packages("shiny") 
+install.packages("shiny")   
 install.packages("shinyjs") 
 
 Assurez-vous d'exécuter cette commande dans votre environnement R.
