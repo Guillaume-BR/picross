@@ -22,11 +22,11 @@ Cela extraira les fichiers dans un dossier nommé "picross".
 
 **Étape 3 : Installation des Dépendances**
 
-Assurez-vous d'avoir installé toutes les dépendances nécessaires. Si votre programme nécessite des packages R spécifiques, vous pouvez les installer en utilisant la fonction install.packages() de R. Par exemple :
+Assurez-vous d'avoir installé toutes les dépendances nécessaires. shiny and shinyjs : 
 
 Dans R :
-
-install.packages("nom_du_package")
+install.packages("shiny") 
+install.packages("shinyjs") 
 
 Assurez-vous d'exécuter cette commande dans votre environnement R.
 
@@ -34,9 +34,7 @@ Assurez-vous d'exécuter cette commande dans votre environnement R.
 Une fois les dépendances installées, vous pouvez exécuter le programme en naviguant vers le répertoire où vous avez extrait les fichiers et en lançant votre script R ou en exécutant la commande spécifique pour démarrer votre application. 
 
 Dans bash :
-
 Rscript picross.R
-
 
 **Étape 5 : Utilisation**
 
