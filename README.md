@@ -15,6 +15,7 @@ Assurez-vous que votre système dispose des éléments suivants :
 Téléchargez le fichier picross.tar.gz sur votre système. Placez-le dans un répertoire où vous souhaitez installer le programme. Ensuite, extrayez le contenu de l'archive en utilisant la commande suivante dans un terminal (ou utilisez un logiciel d'extraction d'archives graphique si vous êtes sous Windows) :
 
 En Bash :
+
 tar -zxvf picross.tar.gz
 
 Cela extraira les fichiers dans un dossier nommé "picross".
@@ -24,6 +25,7 @@ Cela extraira les fichiers dans un dossier nommé "picross".
 Assurez-vous d'avoir installé toutes les dépendances nécessaires. shiny and shinyjs : 
 
 Dans R :
+
 install.packages("shiny") 
 install.packages("shinyjs") 
 
@@ -32,7 +34,8 @@ Assurez-vous d'exécuter cette commande dans votre environnement R.
 **Étape 4 : Exécution**
 Une fois les dépendances installées, vous pouvez exécuter le programme en naviguant vers le répertoire où vous avez extrait les fichiers et en lançant votre script R ou en exécutant la commande spécifique pour démarrer votre application. 
 
-Dans bash :
+Dans Bash :
+
 Rscript picross.R
 
 **Étape 5 : Utilisation**
