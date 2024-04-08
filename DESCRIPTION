@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 Package: picross
 Title: Picross Game
 Version: 0.0.0.9000
@@ -12,3 +13,21 @@ RoxygenNote: 7.3.1
 Imports: 
     shiny (>= 1.8.0),
     shinyjs (>= 2.1.0)
+=======
+Package: picross
+Title: Picross Game
+Version: 0.0.0.9000
+Authors@R: 
+    person("Guillaume", "Bernard-Reymond", , "guillaume.bernard-reymond@etu.umontpellier.fr", role = c("aut", "cre"))
+    person("Maxence", "Lamure", , "maxence.lamure@etu.umontpellier.fr", role = c("aut", "cre"))
+Description: This package is a picross game. You can choose the size and the difficulty.
+License: `MIT`
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.1
+Imports: 
+    shiny (>= 1.8.0),
+    shinyjs (>= 2.1.0)
+Depends: 
+    R (>= 2.10)
+>>>>>>> 6f4cdb4d20f658a7ab7b3fc145a05179f88cb0c2
