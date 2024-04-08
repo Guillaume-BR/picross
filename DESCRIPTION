@@ -7,12 +7,9 @@ Authors@R:
     person("Maxence", "Lamure", , "maxence.lamure@etu.umontpellier.fr", role = c("aut", "cre"))
 Description: This package is a picross game. You can choose the size and the difficulty.
 License: `MIT`
-Imports: shiny (>= 1.8.0),
-    	 shinyjs (>= 2.1.0)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.1
-<<<<<<< HEAD
 Imports: 
     shiny (>= 1.8.0),
     shinyjs (>= 2.1.0)
@@ -34,5 +31,3 @@ Imports:
 Depends: 
     R (>= 2.10)
 >>>>>>> 6f4cdb4d20f658a7ab7b3fc145a05179f88cb0c2
-=======
->>>>>>> parent of fd0a363 (modif)
