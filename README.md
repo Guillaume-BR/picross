@@ -31,17 +31,21 @@ Cela extraira les fichiers dans un dossier nommé "picross".
 
 Assurez-vous d'avoir installé toutes les dépendances nécessaires. shiny and shinyjs : 
 
+```R
 Dans R :  
 install.packages("shiny")   
-install.packages("shinyjs") 
+install.packages("shinyjs")
+```
 
 Assurez-vous d'exécuter cette commande dans votre environnement R.
 
 **Étape 4 : Exécution**
 Une fois les dépendances installées, vous pouvez exécuter le programme en naviguant vers le répertoire où vous avez extrait les fichiers et en lançant votre script R ou en exécutant la commande spécifique pour démarrer votre application. 
 
+```bash
 Dans Bash :  
 Rscript picross.R
+``
 
 **Étape 5 : Utilisation**
 Dans bash, une URL vous est fournie, vous n'avez plus qu'à l'ouvrir dans un terminal.
