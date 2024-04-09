@@ -1,3 +1,8 @@
+#' Mets à jour la matrice du joueur
+#' @export
+
+picross <- function(){
+
 library(shiny)
 library(shinyjs)
 library(rsconnect)
@@ -368,3 +373,5 @@ server <- function(input, output, session) {
 }
 
 shinyApp(ui, server)
+
+}
