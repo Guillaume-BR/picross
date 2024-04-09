@@ -1,8 +1,3 @@
-#' Mets à jour la matrice du joueur
-#' @export
-
-picross <- function(){
-
 library(shiny)
 library(shinyjs)
 library(rsconnect)
@@ -25,7 +20,6 @@ niveaux_difficulte <- list(
 #' update_player_matrix(1, 1)
 #' update_player_matrix(3, 4)
 #' @export
-
 update_player_matrix <- function(i, j) {
   current_joueur <- joueur()
   current_value <- current_joueur[i, j]
@@ -373,5 +367,3 @@ server <- function(input, output, session) {
 }
 
 shinyApp(ui, server)
-
-}
