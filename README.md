@@ -4,7 +4,7 @@ Voici les étapes pour installer le package picross en local sur votre machine e
 
 ## Première solution : directement en ligne :  
 
-<div align="center"> <https://maxencelamure.shinyapps.io/Picross/> </div>
+<https://maxencelamure.shinyapps.io/Picross/>
 
 ## Deuxième solution : à l'aide du fichier tar.gz
 
