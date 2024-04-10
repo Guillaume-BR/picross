@@ -45,16 +45,7 @@ Une fois les dépendances installées, vous pouvez exécuter le programme en nav
 ```bash
 Dans Bash :  
 Rscript picross.R
-``
+``` 
 
 **Étape 5 : Utilisation**
 Dans bash, une URL vous est fournie, vous n'avez plus qu'à l'ouvrir dans un terminal.
-
-## Troisième solution : en installant le package
-
-**Etape 1 :**  
-Dans R, tapez la commande :  
-devtools::install_github("Guillaume-BR/picross")
-
-**Etape 2 :**
-...
