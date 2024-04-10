@@ -4,7 +4,7 @@ Voici les étapes pour installer le package picross en local sur votre machine e
 
 ## Première solution : directement en ligne :  
 
-<https://maxencelamure.shinyapps.io/Picross/>
+[center] <https://maxencelamure.shinyapps.io/Picross/> [center]
 
 ## Deuxième solution : à l'aide du fichier tar.gz
 
@@ -24,7 +24,6 @@ Téléchargez le fichier picross.tar.gz sur votre système. Placez-le dans un r�
 En Bash :  
 tar -zxvf picross.tar.gz
 ```
-
 Cela extraira les fichiers dans un dossier nommé "picross".
 
 **Étape 3 : Installation des Dépendances**
@@ -40,6 +39,7 @@ install.packages("shinyjs")
 Assurez-vous d'exécuter cette commande dans votre environnement R.
 
 **Étape 4 : Exécution**
+
 Une fois les dépendances installées, vous pouvez exécuter le programme en naviguant vers le répertoire où vous avez extrait les fichiers et en lançant votre script R ou en exécutant la commande spécifique pour démarrer votre application. 
 
 ```bash
@@ -48,4 +48,5 @@ Rscript picross.R
 ``` 
 
 **Étape 5 : Utilisation**
-Dans bash, une URL vous est fournie, vous n'avez plus qu'à l'ouvrir dans un terminal.
+
+Dans bash, une URL vous alors est fournie, vous n'avez plus qu'à l'ouvrir dans un terminal.
